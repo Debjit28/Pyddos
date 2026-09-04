@@ -1,30 +1,20 @@
-from fastapi import APIRouter , Query
-
-
-from services.store import get_recent_arcs , get_attack_stats
-
-from services.abuseipdb import fetch_blacklisted_ips , build_attack_events
-
+from fastapi import APIRouter, Query
+from services.store import get_recent_arcs, get_attack_stats
+from services.abuseipdb import fetch_blacklisted_ips, build_attack_events
 from services.store import ingest_attack_events
-
-from models.schemas import AttackArc ,AttackStats
-
+from models.schemas import AttackArc, AttackStats
 
 router = APIRouter()
 
 
-@router.get("/arcs" , response_model=list[AttackArc])
-
-async def get_arcs(limit:int =Query(default = 50 , le = 200)):
-    
+@router.get("/arcs", response_model=list[AttackArc])
+async def get_arcs(limit: int = Query(default=50, le=200)):
     return get_recent_arcs(limit)
 
 
-
-
-@router.get("/stats" , response_model=AttackStats)
+@router.get("/stats", response_model=AttackStats)
 async def get_stats():
-    return get_attack_stats
+    return get_attack_stats()
 
 
 @router.post("/refresh")

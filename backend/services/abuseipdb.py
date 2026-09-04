@@ -2,10 +2,9 @@ import httpx
 import asyncio
 from datetime import datetime
 from typing import Optional
-from configuration import get_settings
+from config import get_settings
 from models.schemas import AttackEvent, GeoLocation
 import logging
-
 
 logger = logging.getLogger(__name__)
 settings = get_settings()

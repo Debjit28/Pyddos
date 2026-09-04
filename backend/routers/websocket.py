@@ -1,9 +1,6 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-
 from services.websocket_manager import manager
-
 from services.store import get_recent_arcs, get_attack_stats
-
 import json
 
 router = APIRouter()
