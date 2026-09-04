@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from config import get_settings
+from configuration import get_settings
 from services.abuseipdb import fetch_blacklisted_ips, build_attack_events
 from services.store import ingest_attack_events
 from services.websocket_manager import manager

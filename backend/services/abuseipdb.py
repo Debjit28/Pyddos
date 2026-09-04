@@ -2,7 +2,7 @@ import httpx
 import asyncio
 from datetime import datetime
 from typing import Optional
-from config import get_settings
+from configuration import get_settings
 from models.schemas import AttackEvent, GeoLocation
 import logging
 

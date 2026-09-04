@@ -1,6 +1,6 @@
 import httpx
 from datetime import datetime, timezone, timedelta
-from config import get_settings
+from configuration import get_settings
 from models.schemas import TrafficTrend, TrendSummary
 import logging
 
