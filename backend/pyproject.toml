@@ -1,0 +1,18 @@
+[project]
+name = "pyddos-backend"
+version = "0.1.0"
+description = "FastAPI backend for the PyDDoS real-time DDoS threat visualization platform"
+readme = "README.md"
+
+authors = [
+    { name = "Debjit28" }
+]
+
+requires-python = ">=3.13"
+
+dependencies = [
+    "fastapi[standard]>=0.141.1",
+    "httpx>=0.28.1",
+    "pydantic-settings>=2.15.0",
+    "python-dotenv>=1.2.3",
+]

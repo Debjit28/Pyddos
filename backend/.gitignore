@@ -1,5 +1,8 @@
+.venv/
 .env
-.python-version
-uv.lock
-pyproject.toml
-.venv
+
+__pycache__/
+*.py[cod]
+
+.pytest_cache/
+.ruff_cache/
