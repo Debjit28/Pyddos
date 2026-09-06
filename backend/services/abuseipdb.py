@@ -47,6 +47,7 @@ async def geolocate_ip(ip: str) -> Optional[GeoLocation]:
                 f"{settings.GEO_API_BASE}/{ip}",
                 params={"fields": "status,lat,lon,city,country,countryCode,isp"},
             )
+            resp.raise_for_status()  
             data = resp.json()
             if data.get("status") != "success":
                 return None

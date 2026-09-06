@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     GEO_API_BASE: str = "http://ip-api.com/json"
     ATTACK_POLL_INTERVAL: int = 60
     TRENDS_POLL_INTERVAL: int = 300
+    
+    USE_MOCK_DATA: bool = True # bcz i am not elon musk
 
     class Config:
         env_file = ".env"
@@ -17,4 +19,5 @@ class Settings(BaseSettings):
 
 @lru_cache()
 def get_settings():
+    
     return Settings()

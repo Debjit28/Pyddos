@@ -57,3 +57,8 @@ class AttackStats(BaseModel):
     countries_affected: int
     top_countries: list[dict]
     last_updated: datetime
+
+class RefreshResult(BaseModel):
+    fetched: int
+    geolocated: int
+    new_arcs: int
