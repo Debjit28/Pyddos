@@ -3,16 +3,11 @@ import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
 import ThreeGlobe from "three-globe";
 import * as THREE from "three";
+import { getThreatLevel } from "@/utils/threat";
 import type { AttackArc } from "@/types/threat";
 
 interface Props {
   arcs: AttackArc[];
-}
-
-function getConfidenceColor(confidence: number) {
-  if (confidence >= 90) return "#ef4444"; // red-500
-  if (confidence >= 80) return "#f97316"; // orange-500
-  return "#eab308"; // yellow-500
 }
 
 function GlobeInstance({ arcs }: Props) {
@@ -37,31 +32,34 @@ function GlobeInstance({ arcs }: Props) {
       .globeImageUrl("//unpkg.com/three-globe/example/img/earth-night.jpg")
       .bumpImageUrl("//unpkg.com/three-globe/example/img/earth-topology.png")
       .showAtmosphere(true)
-      .atmosphereColor("#06b6d4") // cyan-500
+      .atmosphereColor("#0ea5e9") // subtle cyan/blue
       .atmosphereAltitude(0.15)
       .arcStartLat((d: unknown) => (d as AttackArc).src_lat)
       .arcStartLng((d: unknown) => (d as AttackArc).src_lon)
       .arcEndLat((d: unknown) => (d as AttackArc).dst_lat)
       .arcEndLng((d: unknown) => (d as AttackArc).dst_lon)
-      .arcColor((d: unknown) => getConfidenceColor((d as AttackArc).confidence))
+      .arcColor((d: unknown) => getThreatLevel((d as AttackArc).confidence).color)
       .arcDashLength(0.4)
       .arcDashGap(2)
       .arcDashInitialGap(() => Math.random() * 5)
       .arcDashAnimateTime(1500)
-      .arcStroke((d: unknown) => ((d as AttackArc).confidence >= 90 ? 0.8 : 0.4))
+      .arcStroke((d: unknown) => {
+        const conf = (d as AttackArc).confidence;
+        return conf >= 85 ? 1.0 : conf >= 70 ? 0.7 : conf >= 45 ? 0.5 : 0.3;
+      })
       .ringLat((d: unknown) => (d as AttackArc).src_lat)
       .ringLng((d: unknown) => (d as AttackArc).src_lon)
-      .ringColor((d: unknown) => getConfidenceColor((d as AttackArc).confidence))
-      .ringMaxRadius(3)
+      .ringColor((d: unknown) => getThreatLevel((d as AttackArc).confidence).color)
+      .ringMaxRadius((d: unknown) => ((d as AttackArc).confidence >= 85 ? 4 : 3))
       .ringPropagationSpeed(2)
       .ringRepeatPeriod(1000);
       
-    // Custom globe material for darker oceans
+    // Custom globe material for clearer oceans and visible landmass
     const globeMaterial = globe.globeMaterial() as THREE.MeshPhongMaterial;
-    globeMaterial.color = new THREE.Color(0x0a0a1a);
-    globeMaterial.emissive = new THREE.Color(0x000000);
-    globeMaterial.emissiveIntensity = 0.1;
-    globeMaterial.shininess = 0.7;
+    globeMaterial.color = new THREE.Color(0x1a2639); // Deep navy blue for oceans
+    globeMaterial.emissive = new THREE.Color(0x222b44); // Slight emissive glow
+    globeMaterial.emissiveIntensity = 0.2; // Keep night lights visible without washing out
+    globeMaterial.shininess = 0.8;
 
     scene.add(globe);
     globeRef.current = globe;
@@ -84,8 +82,8 @@ function GlobeInstance({ arcs }: Props) {
 
   return (
     <>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[10, 10, 5]} intensity={1} />
+      <ambientLight intensity={1.2} />
+      <directionalLight position={[10, 10, 5]} intensity={1.5} />
       <OrbitControls
         ref={controlsRef}
         enablePan={false}
@@ -103,6 +101,7 @@ function GlobeInstance({ arcs }: Props) {
 
 export function GlobeView({ arcs }: Props) {
   const latestArc = arcs[0];
+  const latestThreat = latestArc ? getThreatLevel(latestArc.confidence) : null;
 
   return (
     <div className="relative h-full w-full bg-[#020617] rounded-xl overflow-hidden border border-slate-800 shadow-2xl">
@@ -123,10 +122,13 @@ export function GlobeView({ arcs }: Props) {
 
       {/* Latest Threat HUD */}
       <div className="absolute top-4 right-4 pointer-events-none w-[220px]">
-        {latestArc && (
+        {latestArc && latestThreat && (
           <div className="bg-slate-950/80 backdrop-blur border border-slate-800 rounded p-3 shadow-xl">
-            <div className="text-[10px] text-slate-500 mb-1 font-bold tracking-widest">LATEST THREAT</div>
-            <div className="font-mono text-sm text-red-400 mb-2">{latestArc.ip}</div>
+            <div className="flex justify-between items-center mb-1">
+              <div className="text-[10px] text-slate-500 font-bold tracking-widest">LATEST THREAT</div>
+              <div className={`text-[9px] font-bold tracking-wider ${latestThreat.tailwindText}`}>{latestThreat.label}</div>
+            </div>
+            <div className={`font-mono text-sm mb-2 ${latestThreat.tailwindText}`}>{latestArc.ip}</div>
             <div className="flex flex-col gap-1 text-xs">
               <div className="flex justify-between">
                 <span className="text-slate-500">SRC</span>
@@ -142,7 +144,7 @@ export function GlobeView({ arcs }: Props) {
               </div>
               <div className="flex justify-between mt-1 pt-1 border-t border-slate-800">
                 <span className="text-slate-500">CONFIDENCE</span>
-                <span className={latestArc.confidence >= 90 ? "text-red-500 font-bold" : latestArc.confidence >= 80 ? "text-orange-500 font-bold" : "text-yellow-500 font-bold"}>
+                <span className={`font-bold ${latestThreat.tailwindText}`}>
                   {latestArc.confidence}%
                 </span>
               </div>
@@ -151,9 +153,35 @@ export function GlobeView({ arcs }: Props) {
         )}
       </div>
 
+      {/* Threat Legend */}
+      <div className="absolute bottom-4 right-4 pointer-events-none">
+        <div className="bg-slate-950/60 backdrop-blur border border-slate-800/50 rounded-lg p-2.5 shadow-xl flex flex-col gap-1.5">
+          <div className="flex items-center gap-2 text-[10px] font-mono">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]"></span>
+            <span className="text-cyan-400 w-14">SAFE</span>
+            <span className="text-slate-500">&lt;45</span>
+          </div>
+          <div className="flex items-center gap-2 text-[10px] font-mono">
+            <span className="w-2 h-2 rounded-full bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.6)]"></span>
+            <span className="text-yellow-400 w-14">ELEVATED</span>
+            <span className="text-slate-500">45-69</span>
+          </div>
+          <div className="flex items-center gap-2 text-[10px] font-mono">
+            <span className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.6)]"></span>
+            <span className="text-orange-500 w-14">HIGH</span>
+            <span className="text-slate-500">70-84</span>
+          </div>
+          <div className="flex items-center gap-2 text-[10px] font-mono">
+            <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>
+            <span className="text-red-500 w-14">CRITICAL</span>
+            <span className="text-slate-500">85+</span>
+          </div>
+        </div>
+      </div>
+
       {/* Bottom Counter */}
-      <div className="absolute bottom-4 left-4 right-4 text-center pointer-events-none">
-          <span className="text-xs text-slate-500 font-mono tracking-widest bg-slate-950/50 px-3 py-1 rounded-full border border-slate-800/50">
+      <div className="absolute bottom-4 left-4 pointer-events-none">
+          <span className="text-xs text-slate-500 font-mono tracking-widest bg-slate-950/60 backdrop-blur px-3 py-1.5 rounded-full border border-slate-800/50">
             {Math.min(arcs.length, 75)} ACTIVE THREATS VISUALIZED
           </span>
       </div>
