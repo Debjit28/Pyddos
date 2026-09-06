@@ -13,6 +13,10 @@ ABUSEIPDB_BASE = "https://api.abuseipdb.com/api/v2"
 
 
 async def fetch_blacklisted_ips() -> list[dict]:
+    if settings.USE_MOCK_DATA:
+        logger.info("Mock mode enabled - skipping AbuseIPDB")
+        return _mock_ip_data()
+
     if not settings.ABUSEIPDB_API_KEY:
         logger.warning("No AbuseIPDB API key — returning mock data")
         return _mock_ip_data()
