@@ -1,6 +1,6 @@
 <div align="center">
 
-# ThreatPulse
+# PYDDOS
 
 **Real-Time DDoS Threat Intelligence & Visualization Platform**
 
@@ -17,7 +17,7 @@ An interactive cyber-threat intelligence platform that ingests malicious IP data
 
 </div>
 
-![ThreatPulse dashboard — interactive global threat visualization, telemetry, traffic trends, and live event feed](./docs/dashboard.png)
+![ThreatPulse dashboard — interactive global threat visualization, telemetry, traffic trends, and live event feed](./Ddos.png)
 *ThreatPulse dashboard — interactive global threat visualization, telemetry, traffic trends, and live event feed.*
 
 ---
