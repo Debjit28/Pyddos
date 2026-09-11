@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel #pydantic work is base model basically lets pythonn read json files 
+from typing import Optional #if i dont add this optional i wont able use why i need to use it bcz some ip not have some field saves me pain from unexpected schema
 from datetime import datetime
 
 
