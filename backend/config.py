@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     ABUSEIPDB_LIMIT: int = 100
     CLOUDFLARE_API_TOKEN: str = ""
     GEO_API_BASE: str = "http://ip-api.com/json"
-    ATTACK_POLL_INTERVAL: int = 60
+    ATTACK_POLL_INTERVAL: int = 21600
     TRENDS_POLL_INTERVAL: int = 300
     
     USE_MOCK_DATA: bool = True # bcz i am not elon musk
