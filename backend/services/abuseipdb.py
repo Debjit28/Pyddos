@@ -38,7 +38,13 @@ async def fetch_blacklisted_ips() -> list[dict]:
                 params=params,
             )
             resp.raise_for_status()
-            return resp.json().get("data", [])
+            data = resp.json().get("data", [])
+            logger.info(
+                "AbuseIPDB fetch successful: status=%s records=%s" ,
+                resp.status_code ,
+                len(data)
+            )
+            return data
         except Exception as e:
             logger.error(f"AbuseIPDB fetch failed: {e}")
             return _mock_ip_data()

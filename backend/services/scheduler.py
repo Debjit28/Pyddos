@@ -19,6 +19,13 @@ async def poll_attacks():
             raw_ips = await fetch_blacklisted_ips()
             events = await build_attack_events(raw_ips)
             new_arcs = ingest_attack_events(events)
+            
+            logger.info(
+                "Attack pipeline: fetched=%s geolocated=%s new_arcs=%s",
+                len(raw_ips),
+                len(events),
+                len(new_arcs),
+            )
 
             if new_arcs:
                 logger.info(f"New arcs: {len(new_arcs)} — broadcasting")
