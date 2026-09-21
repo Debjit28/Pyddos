@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     TRENDS_POLL_INTERVAL: int = 300
     
     USE_MOCK_DATA: bool = True # bcz i am not elon musk
-
+    DATABASE_URL: str
     class Config:
         env_file = ".env"
 
