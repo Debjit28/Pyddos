@@ -1,5 +1,4 @@
 import httpx
-import asyncio
 from datetime import datetime
 from typing import Optional
 from config import get_settings
@@ -50,43 +49,60 @@ async def fetch_blacklisted_ips() -> list[dict]:
             return _mock_ip_data()
 
 
-async def geolocate_ip(ip: str) -> Optional[GeoLocation]:
-    async with httpx.AsyncClient(timeout=10.0) as client:
+
+
+async def geolocate_batch(ips: list[str]) -> dict[str, Optional[GeoLocation]]:
+    results : dict [str , Optional[GeoLocation]] ={}
+    
+    if not ips:
+        return results
+    
+    payload = [
+        {
+            "query" : ip ,
+            "fields": "status,query,lat,lon,city,country,countryCode,isp",
+        }
+        
+        for ip in ips
+    ]
+    
+    async with httpx.AsyncClient(timeout = 15.0) as client:
         try:
-            resp = await client.get(
-                f"{settings.GEO_API_BASE}/{ip}",
-                params={"fields": "status,lat,lon,city,country,countryCode,isp"},
+            resp = await client.post(
+                "http://ip-api.com/batch" ,
+                json = payload ,
             )
-            resp.raise_for_status()  
+            
+            
+            resp.raise_for_status()
             data = resp.json()
-            if data.get("status") != "success":
-                return None
-            return GeoLocation(
-                lat=data["lat"],
-                lon=data["lon"],
-                city=data.get("city", "Unknown"),
-                country=data.get("country", "Unknown"),
-                country_code=data.get("countryCode", "??"),
-                isp=data.get("isp"),
-            )
+            
+            
+            for item in data :
+                ip = item.get("query")
+                if not ip:
+                    continue
+                if item.get("status") != "success":
+                    results[ip] = None
+                    continue
+                
+                results[ip] =   GeoLocation(
+                    lat = item["lat"],
+                    lon=item["lon"],
+                    city = item.get("city" , "Unknown") ,
+                    country = item.get("country" , "Unknown") ,
+                    country_code  = item.get("countryCode" , "??") ,
+                    isp =item.get("isp")
+                )
+            return results
         except Exception as e:
-            logger.warning(f"Geo lookup failed for {ip}: {e}")
-            return None
-
-
-async def geolocate_batch(ips: list[str], batch_size: int = 10) -> dict[str, Optional[GeoLocation]]:
-    results = {}
-    for i in range(0, len(ips), batch_size):
-        batch = ips[i:i + batch_size]
-        tasks = [geolocate_ip(ip) for ip in batch]
-        geos = await asyncio.gather(*tasks)
-        for ip, geo in zip(batch, geos):
-            results[ip] = geo
-        if i + batch_size < len(ips):
-            await asyncio.sleep(1.5)
-    return results
-
-
+            logger.warning(f"Geo Batch Lookup failed sir/maam : {e}")
+            for ip in ips:
+                results[ip] = None
+            return results
+        
+        
+        
 async def build_attack_events(raw_ips: list[dict]) -> list[AttackEvent]:
     filtered = [
         ip for ip in raw_ips
