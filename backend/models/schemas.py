@@ -40,7 +40,7 @@ class TrafficTrend(BaseModel):
     timestamp: datetime
     requests_total: int
     threats_total: int
-    attack_percentage: float
+    attack_activity: float
 
 
 class TrendSummary(BaseModel):
@@ -48,7 +48,7 @@ class TrendSummary(BaseModel):
     trends: list[TrafficTrend]
     peak_attack_time: Optional[datetime] = None
     total_threats: int
-    avg_attack_percentage: float
+    avg_attack_activity: float
 
 
 class AttackStats(BaseModel):

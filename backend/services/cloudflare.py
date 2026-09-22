@@ -39,7 +39,7 @@ async def fetch_traffic_trends(period: str = "1h") -> TrendSummary:
             )
             resp.raise_for_status()
             data = resp.json()
-            logger.warning("Cloudflare response :%s",data)
+            logger.warning  ("Cloudflare response :%s",data)
             return _parse_cf_response(data, period)
         except httpx.HTTPStatusError as e:
             logger.error(
@@ -64,12 +64,21 @@ async def fetch_attack_layer3_summary() -> dict:
     async with httpx.AsyncClient(timeout=15.0) as client:
         try:
             resp = await client.get(
-                f"{CF_RADAR_BASE}/attacks/layer3/summary",
+                f"{CF_RADAR_BASE}/attacks/layer3/summary/PROTOCOL",
                 headers=headers,
                 params={"dateRange": "1d"},
             )
             resp.raise_for_status()
             return resp.json().get("result", {}).get("summary_0", {})
+        
+        except httpx.HTTPStatusError as e:
+            logger.error(
+                "Cloudflare L3 returned %s: %s",
+                e.response.status_code,
+                e.response.text,
+            )
+            return _mock_l3_summary()
+
         except Exception as e:
             logger.error(f"L3 summary failed: {e}")
             return _mock_l3_summary()
@@ -78,30 +87,53 @@ async def fetch_attack_layer3_summary() -> dict:
 def _parse_cf_response(data: dict, period: str) -> TrendSummary:
     try:
         series = data.get("result", {}).get("serie_0", {})
+
         timestamps = series.get("timestamps", [])
-        ddos_values = series.get("DDoS", [])
+        activity_values = series.get("values", [])
+
         trends = []
+
         for i, ts in enumerate(timestamps):
-            threat_pct = float(ddos_values[i]) if i < len(ddos_values) else 0.0
-            trends.append(TrafficTrend(
-                timestamp=datetime.fromisoformat(ts.replace("Z", "+00:00")),
-                requests_total=0,
-                threats_total=0,
-                attack_percentage=threat_pct,
-            ))
-        avg_pct = sum(t.attack_percentage for t in trends) / len(trends) if trends else 0
-        peak = max(trends, key=lambda t: t.attack_percentage, default=None)
+            activity = (
+                float(activity_values[i])
+                if i < len(activity_values)
+                else 0.0
+            )
+
+            trends.append(
+                TrafficTrend(
+                    timestamp=datetime.fromisoformat(
+                        ts.replace("Z", "+00:00")
+                    ),
+                    requests_total=0,
+                    threats_total=0,
+                    attack_activity=activity,
+                )
+            )
+
+        avg_activity = (
+            sum(t.attack_activity for t in trends) / len(trends)
+            if trends
+            else 0
+        )
+
+        peak = max(
+            trends,
+            key=lambda t: t.attack_activity,
+            default=None,
+        )
+
         return TrendSummary(
             period=period,
             trends=trends,
             peak_attack_time=peak.timestamp if peak else None,
-            total_threats=sum(int(t.attack_percentage) for t in trends),
-            avg_attack_percentage=round(avg_pct, 2),
+            total_threats=0,
+            avg_attack_activity=round(avg_activity, 4),
         )
+
     except Exception as e:
         logger.error(f"Failed to parse Cloudflare response: {e}")
         return _mock_trends(period)
-
 
 def _mock_trends(period: str) -> TrendSummary:
     import random
@@ -113,16 +145,16 @@ def _mock_trends(period: str) -> TrendSummary:
             timestamp=ts,
             requests_total=random.randint(50000, 500000),
             threats_total=random.randint(100, 5000),
-            attack_percentage=round(random.uniform(2.0, 18.0), 2),
+            attack_activity=round(random.uniform(0.0, 1.0), 4),
         ))
-    avg = sum(t.attack_percentage for t in trends) / len(trends)
-    peak = max(trends, key=lambda t: t.attack_percentage)
+    avg = sum(t.attack_activity for t in trends) / len(trends)
+    peak = max(trends, key=lambda t: t.attack_activity)
     return TrendSummary(
         period=period,
         trends=trends,
         peak_attack_time=peak.timestamp,
         total_threats=sum(t.threats_total for t in trends),
-        avg_attack_percentage=round(avg, 2),
+        avg_attack_activity=round(avg, 4),
         
     )
 
