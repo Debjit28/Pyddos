@@ -18,7 +18,7 @@ export default function App() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-[#020617] text-slate-200 selection:bg-cyan-500/30">
-      <Header stats={displayStats} connectionStatus={status} dataMode={DATA_MODE} />
+      <Header stats={displayStats} connectionStatus={status} />
       
       <main className="flex flex-1 overflow-hidden p-4 gap-4">
         {/* Left pane: Globe (Hero) */}

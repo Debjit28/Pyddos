@@ -8,6 +8,7 @@ import type { AttackArc } from "@/types/threat";
 
 interface Props {
   arcs: AttackArc[];
+  onArcSelect?: (arc: AttackArc) => void;
 }
 
 function GlobeInstance({ arcs }: Props) {
@@ -43,7 +44,7 @@ function GlobeInstance({ arcs }: Props) {
       .arcDashGap(2)
       .arcDashInitialGap(() => Math.random() * 5)
       .arcDashAnimateTime(1500)
-      .arcStroke((d: unknown) => getThreatLevel((d as AttackArc).confidence).arcStrokeOpacity)
+      .arcStroke((d: unknown) => getThreatLevel((d as AttackArc).confidence).arcThickness)
       .ringLat((d: unknown) => (d as AttackArc).src_lat)
       .ringLng((d: unknown) => (d as AttackArc).src_lon)
       .ringColor((d: unknown) => getThreatLevel((d as AttackArc).confidence).color)
@@ -69,11 +70,9 @@ function GlobeInstance({ arcs }: Props) {
 
   useEffect(() => {
     if (globeRef.current) {
-      // Limit arcs to prevent overcrowding and maintain performance
-      const displayArcs = arcs.slice(0, 75);
       globeRef.current
-        .arcsData(displayArcs)
-        .ringsData(displayArcs);
+        .arcsData(arcs)
+        .ringsData(arcs);
     }
   }, [arcs]);
 
@@ -175,7 +174,7 @@ export function GlobeView({ arcs }: Props) {
       {/* Bottom Counter */}
       <div className="absolute bottom-4 left-4 pointer-events-none">
           <span className="text-xs text-slate-500 font-mono tracking-widest bg-slate-950/60 backdrop-blur px-3 py-1.5 rounded-full border border-slate-800/50">
-            {Math.min(arcs.length, 75)} ACTIVE THREATS VISUALIZED
+            {arcs.length} ACTIVE THREATS VISUALIZED
           </span>
       </div>
     </div>

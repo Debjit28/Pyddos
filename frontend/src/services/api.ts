@@ -4,7 +4,9 @@ import type {
   RefreshResult,
   TrendSummary,
   TrendPeriod,
+  Layer3Summary,
 } from "@/types/threat";
+import { MAX_ARCS } from "@/utils/threat";
 
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000";
@@ -21,7 +23,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 // ── Attack endpoints ─────────────────────────────────────────
 
-export function fetchArcs(limit = 50): Promise<AttackArc[]> {
+export function fetchArcs(limit = MAX_ARCS): Promise<AttackArc[]> {
   return request<AttackArc[]>(`/api/attacks/arcs?limit=${limit}`);
 }
 
@@ -40,9 +42,8 @@ export function fetchHttpTrends(period: TrendPeriod): Promise<TrendSummary> {
 }
 
 /**
- * Layer 3 endpoint exists but its response shape is not yet documented.
- * Typed as `unknown` until the contract is confirmed.
+ * Layer 3 protocol breakdown endpoint
  */
-export function fetchLayer3(): Promise<unknown> {
-  return request<unknown>("/api/trends/layer3");
+export function fetchLayer3(): Promise<Layer3Summary> {
+  return request<Layer3Summary>("/api/trends/layer3");
 }

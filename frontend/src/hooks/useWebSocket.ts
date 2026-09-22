@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import type { AttackArc, AttackStats, ConnectionStatus, WsMessage } from "@/types/threat";
+import { MAX_ARCS } from "@/utils/threat";
 
 const WS_URL = import.meta.env.VITE_WS_URL ?? "ws://127.0.0.1:8000/ws";
-const MAX_ARCS = 200;
 const PING_INTERVAL_MS = 25000; // 25 seconds
 const INITIAL_RECONNECT_DELAY_MS = 1000;
 const MAX_RECONNECT_DELAY_MS = 30000;

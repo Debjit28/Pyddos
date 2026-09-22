@@ -37,7 +37,13 @@ export function TrendChart() {
           </div>
         )}
         
-        {data && (
+        {data && chartData.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center text-xs text-slate-500 font-mono">
+            No Cloudflare data available for this time window
+          </div>
+        )}
+
+        {data && chartData.length > 0 && (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
               <defs>
@@ -82,7 +88,7 @@ export function TrendChart() {
         )}
       </div>
       
-      {data && (
+      {data && chartData.length > 0 && (
         <div className="mt-4 flex items-center justify-between border-t border-slate-800/50 pt-3">
           <div className="text-[10px] text-slate-500 font-bold">AVG ATTACK ACTIVITY</div>
           <div className="text-sm font-mono text-red-500 font-bold">{(data.avg_attack_activity * 100).toFixed(2)}</div>

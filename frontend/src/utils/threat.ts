@@ -1,4 +1,6 @@
-export type ThreatLevel = "SAFE" | "ELEVATED" | "HIGH" | "CRITICAL";
+export type ThreatLevel = "LOW" | "ELEVATED" | "HIGH" | "CRITICAL";
+
+export const MAX_ARCS = 200;
 
 export interface ThreatClassification {
   level: ThreatLevel;
@@ -9,7 +11,7 @@ export interface ThreatClassification {
   tailwindBorder: string;
   minConfidence: number;
   maxConfidence: number;
-  arcStrokeOpacity: number;
+  arcThickness: number;
   ringMaxRadius: number;
 }
 
@@ -23,7 +25,7 @@ export const THREAT_LEVELS: ThreatClassification[] = [
     tailwindBorder: "border-red-500/30",
     minConfidence: 85,
     maxConfidence: 100,
-    arcStrokeOpacity: 1.0,
+    arcThickness: 1.4,
     ringMaxRadius: 4,
   },
   {
@@ -35,7 +37,7 @@ export const THREAT_LEVELS: ThreatClassification[] = [
     tailwindBorder: "border-orange-500/30",
     minConfidence: 70,
     maxConfidence: 84,
-    arcStrokeOpacity: 0.7,
+    arcThickness: 1.0,
     ringMaxRadius: 3,
   },
   {
@@ -45,21 +47,21 @@ export const THREAT_LEVELS: ThreatClassification[] = [
     tailwindText: "text-yellow-400",
     tailwindBg: "bg-yellow-400/10",
     tailwindBorder: "border-yellow-400/30",
-    minConfidence: 45,
+    minConfidence: 50,
     maxConfidence: 69,
-    arcStrokeOpacity: 0.5,
+    arcThickness: 0.7,
     ringMaxRadius: 3,
   },
   {
-    level: "SAFE",
-    label: "SAFE",
-    color: "#22d3ee", // cyan-400
+    level: "LOW",
+    label: "LOW",
+    color: "#06b6d4", // cyan-500 instead of 400 for better contrast or use existing #22d3ee
     tailwindText: "text-cyan-400",
     tailwindBg: "bg-cyan-400/10",
     tailwindBorder: "border-cyan-400/30",
     minConfidence: 0,
-    maxConfidence: 44,
-    arcStrokeOpacity: 0.3,
+    maxConfidence: 49,
+    arcThickness: 0.4,
     ringMaxRadius: 3,
   },
 ];

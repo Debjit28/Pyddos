@@ -61,6 +61,14 @@ export type ConnectionStatus = "connecting" | "connected" | "disconnected";
 /** Data mode indicator — driven by VITE_DATA_MODE env var */
 export type DataMode = "live" | "demo";
 
+/** Layer 3 protocol breakdown */
+export interface Layer3Summary {
+  UDP?: string;
+  TCP?: string;
+  ICMP?: string;
+  GRE?: string;
+}
+
 // ── WebSocket message types ──────────────────────────────────
 
 export interface WsInitMessage {

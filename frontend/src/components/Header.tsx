@@ -1,14 +1,13 @@
 import { Activity, ShieldAlert, Globe2, Server } from "lucide-react";
 import { ConnectionIndicator } from "./ConnectionStatus";
-import type { AttackStats, ConnectionStatus, DataMode } from "@/types/threat";
+import type { AttackStats, ConnectionStatus } from "@/types/threat";
 
 interface Props {
   stats: AttackStats | null;
   connectionStatus: ConnectionStatus;
-  dataMode: DataMode;
 }
 
-export function Header({ stats, connectionStatus, dataMode }: Props) {
+export function Header({ stats, connectionStatus }: Props) {
   return (
     <header className="flex h-14 items-center justify-between border-b border-slate-800 bg-slate-950/80 px-4 backdrop-blur-md sticky top-0 z-50">
       <div className="flex items-center gap-4">
@@ -22,11 +21,9 @@ export function Header({ stats, connectionStatus, dataMode }: Props) {
         <span className="hidden text-xs font-medium text-slate-400 sm:block tracking-widest">
           DDoS THREAT INTELLIGENCE
         </span>
-        {dataMode === "demo" && (
-          <span className="ml-2 rounded-full border border-yellow-500/30 bg-yellow-500/10 px-2 py-0.5 text-[10px] font-bold text-yellow-500 tracking-wider">
-            DEMO MODE
-          </span>
-        )}
+        <span className="ml-2 rounded-full border border-slate-500/30 bg-slate-500/10 px-2 py-0.5 text-[10px] font-bold text-slate-400 tracking-wider">
+          SYSTEM ACTIVE
+        </span>
       </div>
 
       <div className="flex items-center gap-6">
