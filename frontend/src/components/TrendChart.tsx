@@ -4,6 +4,11 @@ import { useTrends } from "@/hooks/useTrends";
 export function TrendChart() {
   const { data, loading, period, setPeriod } = useTrends();
 
+  const chartData = data?.trends.map(t => ({
+    ...t,
+    activityIndex: t.attack_activity * 100
+  })) || [];
+
   return (
     <div className="flex flex-col h-full p-4">
       <div className="flex items-center justify-between mb-4">
@@ -34,7 +39,7 @@ export function TrendChart() {
         
         {data && (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data.trends} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
+            <AreaChart data={chartData} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
               <defs>
                 <linearGradient id="threatGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
@@ -53,7 +58,7 @@ export function TrendChart() {
               <YAxis 
                 stroke="#475569" 
                 fontSize={10}
-                tickFormatter={(val) => `${val}%`}
+                tickFormatter={(val) => `${val}`}
                 domain={[0, 'auto']}
               />
               <Tooltip 
@@ -64,12 +69,12 @@ export function TrendChart() {
               />
               <Area 
                 type="monotone" 
-                dataKey="attack_percentage" 
+                dataKey="activityIndex" 
                 stroke="#ef4444" 
                 strokeWidth={2}
                 fillOpacity={1} 
                 fill="url(#threatGradient)" 
-                name="Attack %"
+                name="Activity Index"
                 isAnimationActive={false}
               />
             </AreaChart>
@@ -79,8 +84,8 @@ export function TrendChart() {
       
       {data && (
         <div className="mt-4 flex items-center justify-between border-t border-slate-800/50 pt-3">
-          <div className="text-[10px] text-slate-500 font-bold">AVG ATTACK TRAFFIC</div>
-          <div className="text-sm font-mono text-red-500 font-bold">{data.avg_attack_percentage.toFixed(2)}%</div>
+          <div className="text-[10px] text-slate-500 font-bold">AVG ATTACK ACTIVITY</div>
+          <div className="text-sm font-mono text-red-500 font-bold">{(data.avg_attack_activity * 100).toFixed(2)}</div>
         </div>
       )}
     </div>

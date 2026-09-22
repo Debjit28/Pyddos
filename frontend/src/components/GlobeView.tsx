@@ -3,7 +3,7 @@ import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
 import ThreeGlobe from "three-globe";
 import * as THREE from "three";
-import { getThreatLevel } from "@/utils/threat";
+import { getThreatLevel, THREAT_LEVELS } from "@/utils/threat";
 import type { AttackArc } from "@/types/threat";
 
 interface Props {
@@ -43,14 +43,11 @@ function GlobeInstance({ arcs }: Props) {
       .arcDashGap(2)
       .arcDashInitialGap(() => Math.random() * 5)
       .arcDashAnimateTime(1500)
-      .arcStroke((d: unknown) => {
-        const conf = (d as AttackArc).confidence;
-        return conf >= 85 ? 1.0 : conf >= 70 ? 0.7 : conf >= 45 ? 0.5 : 0.3;
-      })
+      .arcStroke((d: unknown) => getThreatLevel((d as AttackArc).confidence).arcStrokeOpacity)
       .ringLat((d: unknown) => (d as AttackArc).src_lat)
       .ringLng((d: unknown) => (d as AttackArc).src_lon)
       .ringColor((d: unknown) => getThreatLevel((d as AttackArc).confidence).color)
-      .ringMaxRadius((d: unknown) => ((d as AttackArc).confidence >= 85 ? 4 : 3))
+      .ringMaxRadius((d: unknown) => getThreatLevel((d as AttackArc).confidence).ringMaxRadius)
       .ringPropagationSpeed(2)
       .ringRepeatPeriod(1000);
       
@@ -156,26 +153,22 @@ export function GlobeView({ arcs }: Props) {
       {/* Threat Legend */}
       <div className="absolute bottom-4 right-4 pointer-events-none">
         <div className="bg-slate-950/60 backdrop-blur border border-slate-800/50 rounded-lg p-2.5 shadow-xl flex flex-col gap-1.5">
-          <div className="flex items-center gap-2 text-[10px] font-mono">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]"></span>
-            <span className="text-cyan-400 w-14">SAFE</span>
-            <span className="text-slate-500">&lt;45</span>
-          </div>
-          <div className="flex items-center gap-2 text-[10px] font-mono">
-            <span className="w-2 h-2 rounded-full bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.6)]"></span>
-            <span className="text-yellow-400 w-14">ELEVATED</span>
-            <span className="text-slate-500">45-69</span>
-          </div>
-          <div className="flex items-center gap-2 text-[10px] font-mono">
-            <span className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.6)]"></span>
-            <span className="text-orange-500 w-14">HIGH</span>
-            <span className="text-slate-500">70-84</span>
-          </div>
-          <div className="flex items-center gap-2 text-[10px] font-mono">
-            <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>
-            <span className="text-red-500 w-14">CRITICAL</span>
-            <span className="text-slate-500">85+</span>
-          </div>
+          {[...THREAT_LEVELS].reverse().map((threat) => (
+            <div key={threat.level} className="flex items-center gap-2 text-[10px] font-mono">
+              <span 
+                className="w-2 h-2 rounded-full" 
+                style={{ backgroundColor: threat.color, boxShadow: `0 0 8px ${threat.color}99` }}
+              ></span>
+              <span className={`w-14 ${threat.tailwindText}`}>{threat.label}</span>
+              <span className="text-slate-500">
+                {threat.maxConfidence === 100 
+                  ? `${threat.minConfidence}+` 
+                  : threat.minConfidence === 0 
+                    ? `<${threat.maxConfidence + 1}` 
+                    : `${threat.minConfidence}-${threat.maxConfidence}`}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 

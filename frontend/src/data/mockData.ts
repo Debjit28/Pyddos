@@ -61,12 +61,12 @@ export const MOCK_STATS: AttackStats = {
 export const MOCK_TRENDS: TrendSummary = {
   period: "1h",
   trends: [
-    { timestamp: new Date(Date.now() - 3000000).toISOString(), requests_total: 1000, threats_total: 100, attack_percentage: 10 },
-    { timestamp: new Date(Date.now() - 2000000).toISOString(), requests_total: 1200, threats_total: 150, attack_percentage: 12.5 },
-    { timestamp: new Date(Date.now() - 1000000).toISOString(), requests_total: 1500, threats_total: 300, attack_percentage: 20 },
-    { timestamp: now, requests_total: 1100, threats_total: 120, attack_percentage: 10.9 },
+    { timestamp: new Date(Date.now() - 3000000).toISOString(), requests_total: 1000, threats_total: 100, attack_activity: 0.1 },
+    { timestamp: new Date(Date.now() - 2000000).toISOString(), requests_total: 1200, threats_total: 150, attack_activity: 0.125 },
+    { timestamp: new Date(Date.now() - 1000000).toISOString(), requests_total: 1500, threats_total: 300, attack_activity: 0.2 },
+    { timestamp: now, requests_total: 1100, threats_total: 120, attack_activity: 0.109 },
   ],
   peak_attack_time: new Date(Date.now() - 1000000).toISOString(),
   total_threats: 670,
-  avg_attack_percentage: 13.35,
+  avg_attack_activity: 0.1335,
 };

@@ -40,7 +40,7 @@ export interface TrafficTrend {
   timestamp: string; // ISO-8601
   requests_total: number;
   threats_total: number;
-  attack_percentage: number;
+  attack_activity: number;
 }
 
 /** Matches GET /api/trends/http?period=<period> */
@@ -49,7 +49,7 @@ export interface TrendSummary {
   trends: TrafficTrend[];
   peak_attack_time: string | null;
   total_threats: number;
-  avg_attack_percentage: number;
+  avg_attack_activity: number;
 }
 
 /** Valid trend periods */
