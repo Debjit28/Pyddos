@@ -28,7 +28,7 @@ async def fetch_traffic_trends(period: str = "1h") -> TrendSummary:
     async with httpx.AsyncClient(timeout=15.0) as client:
         try:
             resp = await client.get(
-                f"{CF_RADAR_BASE}/http/timeseries_groups/threat_category",
+                f"{CF_RADAR_BASE}/attacks/layer7/timeseries",
                 headers=headers,
                 params={
                     "dateStart": date_start,
@@ -38,12 +38,24 @@ async def fetch_traffic_trends(period: str = "1h") -> TrendSummary:
                 },
             )
             resp.raise_for_status()
-            return _parse_cf_response(resp.json(), period)
+            data = resp.json()
+            logger.warning("Cloudflare response :%s",data)
+            return _parse_cf_response(data, period)
+        except httpx.HTTPStatusError as e:
+            logger.error(
+                "Cloudflare returned %s : %s" ,
+                e.response.status_code ,
+                e.response.text,
+            )
+            
+            return  _mock_trends(period)
+        
+        
         except Exception as e:
             logger.error(f"Cloudflare fetch failed: {e}")
             return _mock_trends(period)
-
-
+        
+        
 async def fetch_attack_layer3_summary() -> dict:
     if not settings.CLOUDFLARE_API_TOKEN:
         return _mock_l3_summary()
@@ -97,7 +109,7 @@ def _mock_trends(period: str) -> TrendSummary:
     trends = []
     for i in range(12):
         ts = now - timedelta(minutes=5 * (12 - i))
-        trends.append(TrafficTrend(
+        trends.append(TrafficTrend( 
             timestamp=ts,
             requests_total=random.randint(50000, 500000),
             threats_total=random.randint(100, 5000),
