@@ -21,13 +21,15 @@
     "recharts": "^3.10.1",
     "tailwindcss": "^4",
     "three": "^0.185.1",
-    "three-globe": "^2.45.2"
+    "three-globe": "^2.45.2",
+    "topojson-client": "^3.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^10",
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/topojson-client": "^3.1.5",
     "@vitejs/plugin-react": "^6",
     "eslint": "^10",
     "eslint-plugin-react-hooks": "^7.1.1",

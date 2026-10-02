@@ -228,7 +228,7 @@ def _mock_ip_data() -> list[dict]:
         },
         {
             "ipAddress": "9.10.11.12",
-            "abuseConfidenceScore": 92,
+            "abuseConfidenceScore": 12,
             "totalReports": 156,
             "lastReportedAt": now,
             "categories": [7],

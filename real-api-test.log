@@ -1,0 +1,15 @@
+To use the fastapi command, please install "fastapi[standard]":
+
+	pip install "fastapi[standard]"
+
+Traceback (most recent call last):
+  File "/nix/store/vwd11sjrbi96cx3hmlrj09p5ffmgccjx-python3.13-fastapi-0.139.0/bin/.fastapi-wrapped", line 9, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/nix/store/vwd11sjrbi96cx3hmlrj09p5ffmgccjx-python3.13-fastapi-0.139.0/lib/python3.13/site-packages/fastapi/cli.py", line 12, in main
+    raise RuntimeError(message)  # noqa: B904
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: To use the fastapi command, please install "fastapi[standard]":
+
+	pip install "fastapi[standard]"
+

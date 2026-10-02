@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     ATTACK_POLL_INTERVAL: int = 21600
     TRENDS_POLL_INTERVAL: int = 300
     
-    USE_MOCK_DATA: bool = True # bcz i am not elon musk
+    USE_MOCK_DATA: bool = False # bcz i am not elon musk
     DATABASE_URL: str
     class Config:
         env_file = ".env"
